@@ -1,0 +1,96 @@
+- Media Center:
+    - Jellyfin:
+        icon: jellyfin.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:8096"
+        description: "Media streaming & playback"
+    - Jellyseerr:
+        icon: jellyseerr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:5055"
+        description: "Media request & discovery portal"
+    - Navidrome:
+        icon: navidrome.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:4533"
+        description: "Lossless Hi-Fi music streaming"
+
+- Media Management:
+    - Radarr:
+        icon: radarr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:7878"
+        description: "Movie tracking & auto-grabber"
+    - Sonarr:
+        icon: sonarr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:8989"
+        description: "TV & anime series tracking"
+    - Lidarr:
+        icon: lidarr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:8686"
+        description: "Music library & album automation"
+    - Bazarr:
+        icon: bazarr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:6767"
+        description: "Subtitle management & fetcher"
+    - Prowlarr:
+        icon: prowlarr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:9696"
+        description: "Indexer aggregator & proxy"
+    - Debrid Media Manager:
+        icon: mdi-cloud-search-outline
+        href: "https://debridmediamanager.com"
+        description: "RD cached library manager"
+
+- Download Clients:
+    - RdtClient:
+        icon: deluge.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:6500"
+        description: "Real-Debrid high-speed download proxy"
+
+- Automation & Infrastructure:
+    - FlareSolverr:
+        icon: flaresolverr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:8191"
+        description: "Cloudflare anti-bot bypass proxy"
+    - Unpackerr:
+        icon: unpackerr.png
+        href: "http://{{HOMEPAGE_VAR_SERVER_IP}}:8282"
+        description: "Archive extraction & cleanup daemon"
+    - Prowlarr Limiter Gateway:
+        icon: nginx.png
+        href: "http://prowlarr:9696"
+        description: "API rate-limiting gateway"
+        widget:
+          type: customapi
+          url: "http://prowlarr-limiter:9697/status"
+          refreshInterval: 3000
+          display: list
+          mappings:
+            - field: active
+              label: "Active Connections"
+            - field: writing
+              label: "Traffic Shaping"
+            - field: rate
+              label: "Drain Rate"
+            - field: cache
+              label: "Cache Hits"
+    - Queue Cleaner:
+        icon: mdi-broom
+        description: "Servarr stalled item auto-purger"
+        widget:
+          type: customapi
+          url: "http://queue-cleaner:5000"
+          refreshInterval: 5000
+          display: list
+          mappings:
+            - field: status
+              label: "Status"
+            - field: last_check
+              label: "Last Inspected"
+            - field: event_1
+              label: "Log 1"
+            - field: event_2
+              label: "Log 2"
+            - field: event_3
+              label: "Log 3"
+            - field: event_4
+              label: "Log 4"
+            - field: event_5
+              label: "Log 5"
