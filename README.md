@@ -8,17 +8,18 @@ A complete, self-hosted media ecosystem powered by Docker Compose. Includes stre
 
 ```text
 .
-Þ~~ config
-Â Â  ~~~ homepage
-Â Â  |Â Â  ~~~ services.yaml
-Â Â  |Â Â  àŠ‘ groups.yaml
-Â Â  |Â Â  àŠ‘ widgets.yaml
-Â Â  àŠ‘ prowlarr-limiter
-Â Â  Â  Â  àŠ‘ default.conf
-àŠ‘ docker-compose.yml
-àŠ‘ .env.example:àŠ‘ .gitignore:àŠ‘ README.md
-àŠ‘ scripts
-Â Â  àŠ‘ queue_cleaner.py
+|-- config/
+|   |-- homepage/
+|   |   |-- services.yaml
+|   |   `-- widgets.yaml
+|   `-- prowlarr-limiter/
+|       `-- default.conf
+|-- docker-compose.yml
+|-- .env.example
+|-- .gitignore
+|-- README.md
+`-- scripts/
+    `-- queue_cleaner.py
 ```
 
 ---
@@ -37,7 +38,7 @@ Open `.env` and configure:
 * `MEDIA_DIR`: Absolute mount path of your main media storage array.
 * `SERVER_IP` / `HOST_IP`: Your server local LAN IP.
 
-3## 2. Prepare Storage Directories
+### 2. Prepare Storage Directories
 Ensure the base download and media directory skeleton exists on your storage drive:
 ```bash
 mkdir -p ${MEDIA_DIR}/downloads/{sonarr,radarr,lidarr}
@@ -60,14 +61,14 @@ docker compose up -d
 1. Open **Sonarr** (`http://<SERVER_IP>:8989`) -> `Settings` -> `General` -> Copy `API Key`.
 2. Open **Radarr** (`http://<SERVER_IP>:7878`) -> `Settings` -> `General` -> Copy `API Key`.
 3. Open **Lidarr** (`http://<SERVER_IP>:8686`) -> `Settings` -> `General` -> Copy `API Key`.
-4. Paste the keys into `.renv` and restart the queue-cleaner daemon:
+4. Paste the keys into `.env` and restart the queue-cleaner daemon:
 ```bash
 docker compose restart queue-cleaner
 ```
 
 ### 6. Configure Real-Debrid (rdt-client)
 1. Obtain your API Token from Real-Debrid:
-   https://real-debrid.com/apitoken
+   [https://real-debrid.com/apitoken](https://real-debrid.com/apitoken)
 2. Open rdt-client WebUI:
    `http://<SERVER_IP>:6500`
 3. Navigate to **Settings -> Provider**:
@@ -89,7 +90,7 @@ docker compose restart queue-cleaner
 | **Jellyseerr** | `5055` | Media Requests |
 | **Sonarr** | `8989` | TV & Anime Manager |
 | **Radarr** | `7878` | Movie Manager |
-| *(Lidarr** | `8686` | Music Manager |
+| **Lidarr** | `8686` | Music Manager |
 | **Bazarr** | `6767` | Subtitle Fetcher |
 | **Prowlarr** | `9696` | Indexer Manager |
 | **Navidrome** | `4533` | Music Streaming Server |
