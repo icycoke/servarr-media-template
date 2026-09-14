@@ -3,14 +3,13 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_DIR}:/media
+      - ${CONFIG_DIR:-/home/user/servarr/config}/bazarr:/config
+      - ${MEDIA_DIR:-/mnt/storage}:/media
     ports:
       - "6767:6767"
     restart: unless-stopped
@@ -19,11 +18,10 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/prowlarr:/config
+      - ${CONFIG_DIR:-/home/user/servarr/config}/prowlarr:/config
     ports:
       - "9696:9696"
     restart: unless-stopped
@@ -34,13 +32,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/radarr:/config
-      - ${MEDIA_DIR}/downloads:/media/downloads
-      - ${MEDIA_DIR}/movies:/media/movies
+      - ${CONFIG_DIR:-/home/user/servarr/config}/radarr:/config
+      - ${MEDIA_DIR:-/mnt/storage}/downloads:/media/downloads
+      - ${MEDIA_DIR:-/mnt/storage}/movies:/media/movies
     ports:
       - "7878:7878"
     restart: unless-stopped
@@ -51,14 +48,13 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/sonarr:/config
-      - ${MEDIA_DIR}/downloads:/media/downloads
-      - ${MEDIA_DIR}/tv-shows:/media/tv-shows
-      - ${MEDIA_DIR}/anime:/media/anime
+      - ${CONFIG_DIR:-/home/user/servarr/config}/sonarr:/config
+      - ${MEDIA_DIR:-/mnt/storage}/downloads:/media/downloads
+      - ${MEDIA_DIR:-/mnt/storage}/tv-shows:/media/tv-shows
+      - ${MEDIA_DIR:-/mnt/storage}/anime:/media/anime
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -67,12 +63,11 @@ services:
     image: rogerfar/rdtclient:latest
     container_name: rdtclient
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/rdtclient/db:/data/db
-      - ${MEDIA_DIR}/downloads:/media/downloads
+      - ${CONFIG_DIR:-/home/user/servarr/config}/rdtclient/db:/data/db
+      - ${MEDIA_DIR:-/mnt/storage}/downloads:/media/downloads
     ports:
       - "6500:6500"
     restart: unless-stopped
@@ -82,7 +77,7 @@ services:
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=info
-      - TZ=${TZ}
+      - TZ=${TZ:-America/New_York}
     ports:
       - "8191:8191"
     restart: unless-stopped
@@ -90,13 +85,13 @@ services:
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
-    user: ${PUID}:${PGID}
+    user: ${PUID:-1000}:${PGID:-1000}
     network_mode: host
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/jellyfin:/config
-      - ${MEDIA_DIR}:/media
+      - ${CONFIG_DIR:-/home/user/servarr/config}/jellyfin:/config
+      - ${MEDIA_DIR:-/mnt/storage}:/media
     restart: unless-stopped
 
   jellyseerr:
@@ -104,9 +99,9 @@ services:
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=${TZ}
+      - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/jellyseerr:/app/config
+      - ${CONFIG_DIR:-/home/user/servarr/config}/jellyseerr:/app/config
     ports:
       - "5055:5055"
     restart: unless-stopped
@@ -117,16 +112,16 @@ services:
     restart: unless-stopped
     volumes:
       - ./scripts:/scripts:ro
-      - ${CONFIG_DIR}/homepage:/config
+      - ${CONFIG_DIR:-/home/user/servarr/config}/homepage:/config
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-America/New_York}
       - PYTHONUNBUFFERED=1
       - SONARR_URL=http://sonarr:8989
       - RADARR_URL=http://radarr:7878
       - LIDARR_URL=http://lidarr:8686
-      - SONARR_API_KEY=${SONARR_API_KEY}
-      - RADARR_API_KEY=${RADARR_API_KEY}
-      - LIDARR_API_KEY=${LIDARR_API_KEY}
+      - SONARR_API_KEY=${SONARR_API_KEY:-}
+      - RADARR_API_KEY=${RADARR_API_KEY:-}
+      - LIDARR_API_KEY=${LIDARR_API_KEY:-}
       - QUEUE_STUCK_TIMEOUT=900
       - CHECK_INTERVAL=300
     command: sh -c "apk add --no-cache tzdata && pip install --no-cache-dir requests && python -u /scripts/queue_cleaner.py"
@@ -135,16 +130,15 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - HOMEPAGE_VAR_SERVER_IP=${SERVER_IP}
-      - HOMEPAGE_VAR_HOST_IP=${HOST_IP}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
+      - HOMEPAGE_VAR_SERVER_IP=${SERVER_IP:-127.0.0.1}
+      - HOMEPAGE_VAR_HOST_IP=${HOST_IP:-127.0.0.1}
       - HOMEPAGE_ALLOWED_HOSTS=*
     volumes:
-      - ${CONFIG_DIR}/homepage:/app/config
+      - ${CONFIG_DIR:-/home/user/servarr/config}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${MEDIA_DIR}:/media:ro
+      - ${MEDIA_DIR:-/mnt/storage}:/media:ro
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -154,11 +148,10 @@ services:
     container_name: unpackerr
     restart: unless-stopped
     volumes:
-      - ${MEDIA_DIR}/downloads:/media/downloads
+      - ${MEDIA_DIR:-/mnt/storage}/downloads:/media/downloads
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
       - UN_INTERVAL=15s
       - UN_START_DELAY=0s
       - UN_DEBUG=false
@@ -193,13 +186,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}       - TZ=${TZ:-America/New_York}
     volumes:
-      - ${CONFIG_DIR}/lidarr:/config
-      - ${MEDIA_DIR}/downloads:/media/downloads
-      - ${MEDIA_DIR}/music:/media/music
+      - ${CONFIG_DIR:-/home/user/servarr/config}/lidarr:/config
+      - ${MEDIA_DIR:-/mnt/storage}/downloads:/media/downloads
+      - ${MEDIA_DIR:-/mnt/storage}/music:/media/music
     ports:
       - "8686:8686"
     restart: unless-stopped
@@ -207,16 +199,16 @@ services:
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
-    user: ${PUID}:${PGID}
+    user: ${PUID:-1000}:${PGID:-1000}
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-America/New_York}
       - ND_SCANSCHEDULE=1h
       - ND_LOGLEVEL=info
       - ND_SESSIONTIMEOUT=24h
       - ND_ENABLETRANSCODINGCONFIG=true
     volumes:
-      - ${CONFIG_DIR}/navidrome:/data
-      - ${MEDIA_DIR}/music:/music:ro
+      - ${CONFIG_DIR:-/home/user/servarr/config}/navidrome:/data
+      - ${MEDIA_DIR:-/mnt/storage}/music:/music:ro
     ports:
       - "4533:4533"
     restart: unless-stopped
