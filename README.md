@@ -1,6 +1,25 @@
 # Automated Media Server Stack
 
-A complete, self-hosted media ecosystem powered by Docker Compose. Includes streaming services, automated media organizers, indexer aggregation, and download queue managers.
+A complete, self-hosted media ecosystem powered by Docker Compose. Includes streaming services, automated media organizers, indexer aggregation, Real-Debrid ingestion, and download queue managers.
+
+---
+
+## Directory Structure
+
+```text
+.
+Þ~~ config
+Â Â  ~~~ homepage
+Â Â  |Â Â  ~~~ services.yaml
+Â Â  |Â Â  àŠ‘ groups.yaml
+Â Â  |Â Â  àŠ‘ widgets.yaml
+Â Â  àŠ‘ prowlarr-limiter
+Â Â  Â  Â  àŠ‘ default.conf
+àŠ‘ docker-compose.yml
+àŠ‘ .env.example:àŠ‘ .gitignore:àŠ‘ README.md
+àŠ‘ scripts
+Â Â  àŠ‘ queue_cleaner.py
+```
 
 ---
 
@@ -8,28 +27,56 @@ A complete, self-hosted media ecosystem powered by Docker Compose. Includes stre
 
 ### 1. Configure Environment
 Copy the example environment file:
-  cp .env.example .env
+```bash
+cp .env.example .env
+```
 
 Open `.env` and configure:
-* PUID / PGID: Set to your Linux user ID (run `id` in your shell).
-* CONFIG_DIR: Absolute path on your SSD to store application configurations.
-* MEDIA_DIR: Absolute mount path of your main media storage array.
-* SERVER_IP / HOST_IP: Your server local LAN IP.
+* `PUID` / `PGID`: Set to your Linux user ID (run `id` in your shell to check).
+* `CONFIG_DIR`: Absolute path on your SSD to store application configurations.
+* `MEDIA_DIR`: Absolute mount path of your main media storage array.
+* `SERVER_IP` / `HOST_IP`: Your server local LAN IP.
 
-### 2. Prepare Storage Directories
-Ensure the base directory skeleton exists on your storage drive:
-  mkdir -p ${MEDIA_DIR}/downloads/{sonarr,radarr,lidarr}
-  mkdir -p ${MEDIA_DIR}/{movies,tv-shows,anime,music}
+3## 2. Prepare Storage Directories
+Ensure the base download and media directory skeleton exists on your storage drive:
+```bash
+mkdir -p ${MEDIA_DIR}/downloads/{sonarr,radarr,lidarr}
+mkdir -p ${MEDIA_DIR}/{movies,tv-shows,anime,music}
+```
 
-### 3. Start Containers
-  docker compose up -d
+### 3. Initialize Homepage Config
+Ensure the pre-configured Homepage templates are copied to your persistent config directory before starting:
+```bash
+mkdir -p ${CONFIG_DIR}/homepage
+cp -r config/homepage/* ${CONFIG_DIR}/homepage/
+```
 
-### 4. Post-Install API Keys
-1. Open Sonarr (http://<SERVER_IP>:8989) -> Settings -> General -> Copy API Key.
-2. Open Radarr (http://<SERVER_IP>:7878) -> Settings -> General -> Copy API Key.
-3. Open Lidarr (http://<SERVER_IP>:8686) -> Settings -> General -> Copy API Key.
-4. Paste the keys into `.env` and reload the cleaner daemon:
-  docker compose restart queue-cleaner
+### 4. Start Containers
+```bash
+docker compose up -d
+```
+
+### 5. Post-Install API Keys
+1. Open **Sonarr** (`http://<SERVER_IP>:8989`) -> `Settings` -> `General` -> Copy `API Key`.
+2. Open **Radarr** (`http://<SERVER_IP>:7878`) -> `Settings` -> `General` -> Copy `API Key`.
+3. Open **Lidarr** (`http://<SERVER_IP>:8686`) -> `Settings` -> `General` -> Copy `API Key`.
+4. Paste the keys into `.renv` and restart the queue-cleaner daemon:
+```bash
+docker compose restart queue-cleaner
+```
+
+### 6. Configure Real-Debrid (rdt-client)
+1. Obtain your API Token from Real-Debrid:
+   https://real-debrid.com/apitoken
+2. Open rdt-client WebUI:
+   `http://<SERVER_IP>:6500`
+3. Navigate to **Settings -> Provider**:
+   * Select Provider: `RealDebrid`
+   * Paste your API Token
+4. Navigate to **Settings -> Downloader**:
+   * Download Client: `Internal Downloader`
+   * Save Path: `/media/downloads`
+5. Save settings. rdt-client now handles cached torrents via Real-Debrid for Sonarr and Radarr.
 
 ---
 
@@ -37,26 +84,14 @@ Ensure the base directory skeleton exists on your storage drive:
 
 | Service | Port | Description |
 | :--- | :--- | :--- |
-| Homepage | 3000 | Central Dashboard |
-| Jellyfin | 8096 | Streaming Server |
-| Jellyseerr | 5055 | Media Requests |
-| Sonarr | 8989 | TV & Anime Manager |
-| Radarr | 7878 | Movie Manager |
-| Lidarr | 8686 | Music Manager |
-| Bazarr | 6767 | Subtitle Fetcher |
-| Prowlarr | 9696 | Indexer Manager |
-| Navidrome | 4533 | Music Streaming Server |
-| rdtclient | 6500 | Real-Debrid / Downloader WebUI |
-
-### 5. Configure Real-Debrid (rdt-client)
-1. Obtain your API Token:
-   https://real-debrid.com/apitoken
-2. Open rdt-client WebUI:
-   http://\<SERVER_IP\>:6500
-3. Go to Settings -> Provider:
-   - Select Provider: RealDebrid
-   - Paste your API Token
-4. Go to Settings -> Downloader:
-   - Download Client: Internal Downloader
-   - Save Path: /media/downloads
-5. Save settings. rdt-client now handles cached torrents via Real-Debrid for Sonarr and Radarr.
+| **Homepage** | `3000` | Central Dashboard |
+| **Jellyfin** | `8096` | Media Streaming Server |
+| **Jellyseerr** | `5055` | Media Requests |
+| **Sonarr** | `8989` | TV & Anime Manager |
+| **Radarr** | `7878` | Movie Manager |
+| *(Lidarr** | `8686` | Music Manager |
+| **Bazarr** | `6767` | Subtitle Fetcher |
+| **Prowlarr** | `9696` | Indexer Manager |
+| **Navidrome** | `4533` | Music Streaming Server |
+| **rdtclient** | `6500` | Real-Debrid / Downloader WebUI |
+| **FlareSolverr** | `8191` | Cloudflare Bypass Proxy |
